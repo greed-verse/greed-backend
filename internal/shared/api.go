@@ -1,4 +1,4 @@
-package core
+package shared
 
 import (
 	"time"
@@ -36,5 +36,5 @@ func (api *API) Router() fiber.Router {
 
 func (api *API) InitMiddlewares(logger *Logger) {
 	api.Core().Use(logger.Middleware())
-    api.Core().Use(helmet.New())
+	api.Core().Use(helmet.New())
 }

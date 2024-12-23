@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/greed-verse/greed/cmd"
+)
 
 func main() {
-	fmt.Println("Hello World")
+	if err := cmd.Execute(); err != nil {
+		panic(fmt.Sprintf("Failed Setup: %s", err))
+	}
 }
