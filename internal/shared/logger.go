@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"runtime/debug"
@@ -74,9 +75,10 @@ func (l *Logger) Middleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		start := time.Now()
 		defer func() {
+			fmt.Println(time.Since(start).Nanoseconds())
 			l.core.Info().
 				Str("method", c.Method()).
-				Str("time", time.Since(start).String()).
+				Str("time_elapsed", time.Since(start).String()).
 				Str("route", c.Route().Path).
 				Send()
 		}()
