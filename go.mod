@@ -10,7 +10,10 @@ require (
 	github.com/rs/zerolog v1.33.0
 )
 
+require github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
+
 require (
+	github.com/Timothylock/go-signin-with-apple v0.2.3
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
