@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 
@@ -15,11 +16,13 @@ func Execute() error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(url)
 
 	addr, err := ResolveEnv("DB_URL")
 	if err != nil {
 		return err
 	}
+	fmt.Println(addr)
 
 	ctx := context.Background()
 	dbConn, err := pgx.Connect(ctx, url)
