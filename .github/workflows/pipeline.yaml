@@ -54,7 +54,7 @@ jobs:
       uses: cssnr/stack-deploy-action@v1
       with:
         name: greed
-        file: deployments/docker-compose.yaml
+        file: deployment/docker-compose.yaml
         host: ${{secrets.DEPLOY_HOST}}
         user: deploy
         ssh_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
