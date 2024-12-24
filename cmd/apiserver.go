@@ -18,7 +18,7 @@ func Execute() error {
 	}
 	fmt.Println(url)
 
-	addr, err := ResolveEnv("DB_URL")
+	addr, err := ResolveEnv("APP_ADDRESS")
 	if err != nil {
 		return err
 	}
