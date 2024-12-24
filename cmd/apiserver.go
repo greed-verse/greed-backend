@@ -3,28 +3,47 @@ package cmd
 import (
 	"context"
 	"os"
+	"strings"
 
 	"github.com/greed-verse/greed/internal/account"
 	"github.com/greed-verse/greed/internal/shared"
 	"github.com/jackc/pgx/v5"
-	"github.com/joho/godotenv"
 )
 
 func Execute() error {
-	if err := godotenv.Load(); err != nil {
-		return err
-	}
-
-	ctx := context.Background()
-	dbConn, err := pgx.Connect(ctx, os.Getenv("DB_URL"))
+	url, err := ResolveEnv("DB_URL")
 	if err != nil {
 		return err
 	}
 
-	appContext := shared.New(dbConn, os.Getenv("APP_ADDRESS"))
+	addr, err := ResolveEnv("DB_URL")
+	if err != nil {
+		return err
+	}
+
+	ctx := context.Background()
+	dbConn, err := pgx.Connect(ctx, url)
+	if err != nil {
+		return err
+	}
+
+	appContext := shared.New(dbConn, addr)
 
 	account.InitModule(appContext)
 
 	appContext.Serve()
 	return nil
+}
+
+func ResolveEnv(env string) (string, error) {
+	filepath, exists := os.LookupEnv(env + "_FILE")
+
+	if exists {
+		content, err := os.ReadFile(filepath)
+		if err != nil {
+			return "", err
+		}
+		return strings.TrimSpace(string(content)), nil
+	}
+	return os.Getenv(env), nil
 }
