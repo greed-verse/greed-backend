@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/helmet"
 )
 
 type API struct {
@@ -59,5 +58,4 @@ func (api *API) Router() fiber.Router {
 
 func (api *API) InitMiddlewares(logger *Logger) {
 	api.Core().Use(logger.Middleware())
-	api.Core().Use(helmet.New())
 }
