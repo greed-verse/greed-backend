@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"errors"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -19,11 +20,33 @@ func NewApi(logger *Logger) *API {
 		DisableStartupMessage: true,
 		ReadTimeout:           time.Second * 5,
 		WriteTimeout:          time.Second * 5,
+		ErrorHandler:          errorHandler,
 	}
 	server := fiber.New(config)
 
 	router := server.Group("/v1")
 	return &API{core: server, router: router}
+}
+
+func errorHandler(ctx *fiber.Ctx, err error) error {
+	code := fiber.StatusInternalServerError
+
+	var e *fiber.Error
+	if errors.As(err, &e) {
+		code = e.Code
+	}
+
+	err = ctx.Status(code).JSON(fiber.Map{
+		"error": e.Error(),
+	})
+
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Internal Server Error",
+		})
+	}
+
+	return nil
 }
 
 func (api *API) Core() *fiber.App {
