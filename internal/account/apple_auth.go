@@ -7,6 +7,7 @@ import (
 	"github.com/Timothylock/go-signin-with-apple/apple"
 	"github.com/gofiber/fiber/v2"
 	"github.com/greed-verse/greed/internal/account/repo"
+	"github.com/greed-verse/greed/pkg/env"
 )
 
 type AppleAuthConfig struct {
@@ -21,6 +22,8 @@ type appleAuthRequest struct {
 	RedirectURI string `json:"redirect_uri"`
 }
 
+var config *AppleAuthConfig
+
 func (a *Account) validateAppleAuthInput(input *appleAuthRequest) error {
 	if input.Code == "" {
 		return fmt.Errorf("code is required")
@@ -29,6 +32,15 @@ func (a *Account) validateAppleAuthInput(input *appleAuthRequest) error {
 }
 
 func (a *Account) HandleAppleAuth(ctx *fiber.Ctx) error {
+	if config == nil {
+		config = &AppleAuthConfig{
+			TeamID:     env.GetEnv().APPLE_TEAM_ID(),
+			ClientID:   env.GetEnv().APPLE_CLIENT_ID(),
+			KeyID:      env.GetEnv().APPLE_KEY_ID(),
+			PrivateKey: env.GetEnv().APPLE_PRIVATE_KEY(),
+		}
+	}
+
 	var input appleAuthRequest
 	if err := ctx.BodyParser(&input); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Invalid request body")
@@ -39,10 +51,10 @@ func (a *Account) HandleAppleAuth(ctx *fiber.Ctx) error {
 	}
 
 	secret, err := apple.GenerateClientSecret(
-		a.appleConfig.PrivateKey,
-		a.appleConfig.TeamID,
-		a.appleConfig.ClientID,
-		a.appleConfig.KeyID,
+		config.PrivateKey,
+		config.TeamID,
+		config.ClientID,
+		config.KeyID,
 	)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
@@ -50,7 +62,7 @@ func (a *Account) HandleAppleAuth(ctx *fiber.Ctx) error {
 
 	client := apple.New()
 	vReq := apple.AppValidationTokenRequest{
-		ClientID:     a.appleConfig.ClientID,
+		ClientID:     config.ClientID,
 		ClientSecret: secret,
 		Code:         input.Code,
 	}
@@ -104,4 +116,3 @@ func (a *Account) HandleAppleAuth(ctx *fiber.Ctx) error {
 		"email_verified": emailVerified,
 	})
 }
-

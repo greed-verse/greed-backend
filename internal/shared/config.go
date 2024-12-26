@@ -30,8 +30,7 @@ func New(db *pgx.Conn, addr string) *AppContext {
 		API:    api,
 		Logger: logger,
 		Repo:   db,
-
-        Addr: addr,
+		Addr:   addr,
 	}
 }
 
