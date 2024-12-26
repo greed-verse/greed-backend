@@ -19,23 +19,10 @@ func Execute() error {
 		return err
 	}
 
-  appContext := shared.New(dbConn, environment.APP_ADDRESS())
+	appContext := shared.New(dbConn, environment.APP_ADDRESS())
 
 	account.InitModule(appContext)
 
 	appContext.Serve()
 	return nil
-}
-
-func ResolveEnv(env string) (string, error) {
-	filepath, exists := os.LookupEnv(env + "_FILE")
-
-	if exists {
-		content, err := os.ReadFile(filepath)
-		if err != nil {
-			return "", err
-		}
-		return strings.TrimSpace(string(content)), nil
-	}
-	return os.Getenv(env), nil
 }
