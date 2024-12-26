@@ -52,32 +52,32 @@ func newEnv() (SecretStorer, error) {
 		return nil, err
 	}
 
-	teamId, err := environment.ResolveEnv("APPLE_TEAM_ID")
-	if err != nil {
-		return nil, err
-	}
-
-	clientId, err := environment.ResolveEnv("APPLE_CLIENT_ID")
-	if err != nil {
-		return nil, err
-	}
-
-	keyId, err := environment.ResolveEnv("APPLE_KEY_ID")
-	if err != nil {
-		return nil, err
-	}
-
-	privateKey, err := environment.ResolveEnv("APPLE_PRIVATE_KEY")
-	if err != nil {
-		return nil, err
-	}
+	// teamId, err := environment.ResolveEnv("APPLE_TEAM_ID")
+	// if err != nil {
+	// 	return nil, err
+	// }
+	//
+	// clientId, err := environment.ResolveEnv("APPLE_CLIENT_ID")
+	// if err != nil {
+	// 	return nil, err
+	// }
+	//
+	// keyId, err := environment.ResolveEnv("APPLE_KEY_ID")
+	// if err != nil {
+	// 	return nil, err
+	// }
+	//
+	// privateKey, err := environment.ResolveEnv("APPLE_PRIVATE_KEY")
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	environment.database = url
 	environment.port = port
-	environment.appleTeamId = teamId
-	environment.appleClientId = clientId
-	environment.appleKeyId = keyId
-	environment.applePrivateKey = privateKey
+	// environment.appleTeamId = teamId
+	// environment.appleClientId = clientId
+	// environment.appleKeyId = keyId
+	// environment.applePrivateKey = privateKey
 	return environment, nil
 }
 

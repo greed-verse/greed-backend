@@ -33,10 +33,10 @@ services:
     image: ghcr.io/greed-verse/greed-backend:${GIT_COMMIT_HASH:-latest}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.tutorme.rule=Host(`greed.tutorme.tech`) || HostRegexp(`{subdomain:[a-z]+}.tutorme.tech`)"
-      - "traefik.http.routers.tutorme.entrypoints=websecure"
-      - "traefik.http.routers.tutorme.tls.certresolver=myresolver"
-      - "traefik.http.services.tutorme.loadbalancer.server.port=3000"
+      - "traefik.http.routers.greed.rule=Host(`greed.tutorme.tech`) || HostRegexp(`{subdomain:[a-z]+}.tutorme.tech`)"
+      - "traefik.http.routers.greed.entrypoints=websecure"
+      - "traefik.http.routers.greed.tls.certresolver=myresolver"
+      - "traefik.http.services.greed.loadbalancer.server.port=3000"
     deploy:
       mode: replicated
       replicas: 3
