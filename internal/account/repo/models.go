@@ -5,15 +5,14 @@
 package repo
 
 import (
+	"time"
+
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type User struct {
-	ID           uuid.UUID          `json:"id"`
-	Email        string             `json:"email"`
-	Name         string             `json:"name"`
-	FirstName    pgtype.Text        `json:"first_name"`
-	ProfileImage pgtype.Text        `json:"profile_image"`
-	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+	ID        uuid.UUID `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
 }

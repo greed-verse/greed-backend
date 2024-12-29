@@ -1,14 +1,12 @@
-CREATE TABLE IF NOT EXISTS users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email VARCHAR(255) UNIQUE NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    first_name VARCHAR(255),
-    profile_image TEXT,
-    created_at timestamptz DEFAULT NOW()
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),     -- Unique identifier (UUID)
+    username VARCHAR(50) NOT NULL UNIQUE,             -- Unique username
+    email VARCHAR(255) NOT NULL UNIQUE,               -- Unique email address
+    created_at timestamptz DEFAULT NOW() NOT NULL, -- Account creation timestamp
+    CHECK (char_length(username) >= 3),               -- Ensure username has at least 3 characters
+    CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$') -- Validate email format
 );
 
--- Create an index on the email field for faster lookups
-CREATE UNIQUE INDEX idx_users_email ON users(email);
-
--- Create an index on the id field for faster lookups
-CREATE UNIQUE INDEX idx_users_id ON users(id);
+-- Indexes for fast lookups
+CREATE INDEX idx_users_id ON users (id);            -- Index on the primary key
+CREATE INDEX idx_users_email ON users (email);      -- Index for efficient email lookups

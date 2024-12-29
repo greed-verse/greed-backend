@@ -9,7 +9,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const checkEmailExists = `-- name: CheckEmailExists :one
@@ -28,49 +27,40 @@ func (q *Queries) CheckEmailExists(ctx context.Context, email string) (bool, err
 }
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (email, name, first_name, profile_image )
-VALUES ($1, $2, $3, $4)
-RETURNING id, email, name, first_name, profile_image, created_at
+INSERT INTO users (username, email)
+VALUES ($1, $2)
+RETURNING id, username, email, created_at
 `
 
 type CreateUserParams struct {
-	Email        string      `json:"email"`
-	Name         string      `json:"name"`
-	FirstName    pgtype.Text `json:"first_name"`
-	ProfileImage pgtype.Text `json:"profile_image"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser,
-		arg.Email,
-		arg.Name,
-		arg.FirstName,
-		arg.ProfileImage,
-	)
+	row := q.db.QueryRow(ctx, createUser, arg.Username, arg.Email)
 	var i User
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.Email,
-		&i.Name,
-		&i.FirstName,
-		&i.ProfileImage,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
-const deleteUserByID = `-- name: DeleteUserByID :exec
+const deleteUser = `-- name: DeleteUser :exec
 DELETE FROM users
 WHERE id = $1
 `
 
-func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.Exec(ctx, deleteUserByID, id)
+func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteUser, id)
 	return err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, name, first_name, profile_image, created_at
+SELECT id, username, email, created_at
 FROM users
 WHERE email = $1
 `
@@ -80,17 +70,15 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 	var i User
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.Email,
-		&i.Name,
-		&i.FirstName,
-		&i.ProfileImage,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, email, name, first_name, profile_image, created_at
+SELECT id, username, email, created_at
 FROM users
 WHERE id = $1
 `
@@ -100,23 +88,27 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	var i User
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.Email,
-		&i.Name,
-		&i.FirstName,
-		&i.ProfileImage,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, email, name, first_name, profile_image, created_at
+SELECT id, username, email, created_at
 FROM users
 ORDER BY created_at DESC
+LIMIT $1 OFFSET $2
 `
 
-func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.db.Query(ctx, listUsers)
+type ListUsersParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error) {
+	rows, err := q.db.Query(ctx, listUsers, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -126,10 +118,8 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 		var i User
 		if err := rows.Scan(
 			&i.ID,
+			&i.Username,
 			&i.Email,
-			&i.Name,
-			&i.FirstName,
-			&i.ProfileImage,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -140,4 +130,28 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateUserEmail = `-- name: UpdateUserEmail :one
+UPDATE users
+SET email = $1
+WHERE id = $2
+RETURNING id, username, email, created_at
+`
+
+type UpdateUserEmailParams struct {
+	Email string    `json:"email"`
+	ID    uuid.UUID `json:"id"`
+}
+
+func (q *Queries) UpdateUserEmail(ctx context.Context, arg UpdateUserEmailParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUserEmail, arg.Email, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.CreatedAt,
+	)
+	return i, err
 }

@@ -3,11 +3,14 @@ package account
 import (
 	"context"
 	"fmt"
+	"math/big"
 
 	"github.com/Timothylock/go-signin-with-apple/apple"
 	"github.com/gofiber/fiber/v2"
 	"github.com/greed-verse/greed/internal/account/repo"
 	"github.com/greed-verse/greed/pkg/env"
+	"github.com/greed-verse/greed/pkg/validator"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type AppleAuthConfig struct {
@@ -19,7 +22,7 @@ type AppleAuthConfig struct {
 
 type appleAuthRequest struct {
 	Code        string `json:"code" validate:"required"`
-	RedirectURI string `json:"redirect_uri"`
+	RedirectURI string `json:"redirect_uri" validate:"required"`
 }
 
 var config *AppleAuthConfig
@@ -42,12 +45,8 @@ func (a *Account) HandleAppleAuth(ctx *fiber.Ctx) error {
 	}
 
 	var input appleAuthRequest
-	if err := ctx.BodyParser(&input); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Invalid request body")
-	}
-
-	if err := a.validateAppleAuthInput(&input); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	if err := validator.GetValidator().Struct(input); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Request is missing fields")
 	}
 
 	secret, err := apple.GenerateClientSecret(
@@ -96,12 +95,19 @@ func (a *Account) HandleAppleAuth(ctx *fiber.Ctx) error {
 	var user repo.User
 	if !exists {
 		params := repo.CreateUserParams{
-			Email: email,
-			Name:  email,
+			Email:    email,
+			Username: email,
 		}
 		user, err = a.repo.CreateUser(ctx.Context(), params)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		var balance pgtype.Numeric
+		balance.Int.Set(big.NewInt(int64(0.0)))
+		_, err = a.wallet.CreateWallet(user.ID, balance)
+		if err != nil {
+			return err
 		}
 	} else {
 		user, err = a.repo.GetUserByEmail(ctx.Context(), email)
