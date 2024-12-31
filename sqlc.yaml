@@ -12,8 +12,7 @@ sql:
         overrides:
           - db_type: "uuid"
             go_type:
-              import: "github.com/google/uuid"
-              type: "UUID"
+              type: "string"
           - db_type: "timestamptz"
             go_type:
               import: "time"
@@ -30,8 +29,7 @@ sql:
         overrides:
           - db_type: "uuid"
             go_type:
-              import: "github.com/google/uuid"
-              type: "UUID"
+              type: "string"
           - db_type: "timestamptz"
             go_type:
               import: "time"

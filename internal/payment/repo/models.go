@@ -7,13 +7,12 @@ package repo
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Wallet struct {
-	ID        uuid.UUID      `json:"id"`
-	UserID    uuid.UUID      `json:"user_id"`
+	ID        string         `json:"id"`
+	UserID    string         `json:"user_id"`
 	Balance   pgtype.Numeric `json:"balance"`
 	UpdatedAt time.Time      `json:"updated_at"`
 }

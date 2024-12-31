@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/greed-verse/greed/internal/account"
 	"github.com/greed-verse/greed/internal/payment"
@@ -12,6 +13,8 @@ import (
 
 func Execute() error {
 	environment := env.GetEnv()
+	fmt.Println(env.GetEnv().DB_URL())
+	fmt.Println(env.GetEnv().APP_ADDRESS())
 
 	ctx := context.Background()
 	dbConn, err := pgx.Connect(ctx, environment.DB_URL())

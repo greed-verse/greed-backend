@@ -7,8 +7,6 @@ package repo
 
 import (
 	"context"
-
-	"github.com/google/uuid"
 )
 
 const checkEmailExists = `-- name: CheckEmailExists :one
@@ -54,7 +52,7 @@ DELETE FROM users
 WHERE id = $1
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
+func (q *Queries) DeleteUser(ctx context.Context, id string) error {
 	_, err := q.db.Exec(ctx, deleteUser, id)
 	return err
 }
@@ -83,7 +81,7 @@ FROM users
 WHERE id = $1
 `
 
-func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
+func (q *Queries) GetUserByID(ctx context.Context, id string) (User, error) {
 	row := q.db.QueryRow(ctx, getUserByID, id)
 	var i User
 	err := row.Scan(
@@ -140,8 +138,8 @@ RETURNING id, username, email, created_at
 `
 
 type UpdateUserEmailParams struct {
-	Email string    `json:"email"`
-	ID    uuid.UUID `json:"id"`
+	Email string `json:"email"`
+	ID    string `json:"id"`
 }
 
 func (q *Queries) UpdateUserEmail(ctx context.Context, arg UpdateUserEmailParams) (User, error) {
