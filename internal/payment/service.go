@@ -30,6 +30,5 @@ func (p *Payment) walletHandler(msg *message.Message) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
 }

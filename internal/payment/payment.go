@@ -26,6 +26,7 @@ func New(context *shared.AppContext) *Payment {
 
 	var module *Payment = &Payment{
 		logger: context.Logger,
+		pubsub: context.PubSub,
 		router: router,
 		repo:   repo,
 	}
