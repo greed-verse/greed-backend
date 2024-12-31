@@ -8,28 +8,31 @@ import (
 
 type Account struct {
 	logger *shared.Logger
+	pubsub *shared.PubSub
 	router fiber.Router
 	repo   *repo.Queries
-
-	wallet shared.WalletService
 }
 
-func New(context *shared.AppContext, walletService shared.WalletService) *Account {
+func New(context *shared.AppContext) {
 	repo := repo.New(context.Repo)
 	router := context.API.Router().Group("/account")
 
 	var module *Account = &Account{
 		logger: context.Logger,
+		pubsub: context.PubSub,
 		router: router,
 		repo:   repo,
 	}
-	module.Serve()
-	return module
+	module.subscribe()
+	module.serve()
 }
 
-func (a *Account) Serve() {
+func (a *Account) serve() {
 	a.router.Get("/health", a.Health)
 	a.router.Post("/auth/apple", a.HandleAppleAuth)
 	a.router.Get("/auth/logout", a.HandleAppleAuth)
 	a.router.Get("/user/profile/:resource?", a.HandleAppleAuth)
+}
+
+func (a *Account) subscribe() {
 }

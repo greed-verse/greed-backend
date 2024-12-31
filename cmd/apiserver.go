@@ -21,10 +21,8 @@ func Execute() error {
 
 	appContext := shared.New(dbConn, environment.APP_ADDRESS())
 
-	paymentModule := payment.New(appContext)
-	walletService := payment.NewWalletService(paymentModule)
-
-	account.New(appContext, walletService)
+	payment.New(appContext)
+	account.New(appContext)
 
 	appContext.Serve()
 	return nil

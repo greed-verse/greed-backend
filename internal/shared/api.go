@@ -56,6 +56,8 @@ func (api *API) Router() fiber.Router {
 	return api.router
 }
 
-func (api *API) InitMiddlewares(logger *Logger) {
-	api.Core().Use(logger.Middleware())
+func (api *API) InitMiddlewares(mws ...fiber.Handler) {
+	for _, mw := range mws {
+		api.Router().Use(mw)
+	}
 }

@@ -3,14 +3,14 @@ package account
 import (
 	"context"
 	"fmt"
-	"math/big"
 
+	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/Timothylock/go-signin-with-apple/apple"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/greed-verse/greed/internal/account/repo"
 	"github.com/greed-verse/greed/pkg/env"
 	"github.com/greed-verse/greed/pkg/validator"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type AppleAuthConfig struct {
@@ -103,12 +103,12 @@ func (a *Account) HandleAppleAuth(ctx *fiber.Ctx) error {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
-		var balance pgtype.Numeric
-		balance.Int.Set(big.NewInt(int64(0.0)))
-		_, err = a.wallet.CreateWallet(user.ID, balance)
+		uid, err := uuid.NewV7()
 		if err != nil {
 			return err
 		}
+		var msg *message.Message = message.NewMessage(uid.String(), []byte(user.ID.String()))
+		a.pubsub.Core().Publish("user-created.topic", msg)
 	} else {
 		user, err = a.repo.GetUserByEmail(ctx.Context(), email)
 		if err != nil {
