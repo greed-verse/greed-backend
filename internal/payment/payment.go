@@ -55,12 +55,8 @@ func (p *Payment) subscribe() error {
 
 func (p *Payment) walletMiddleware(h message.HandlerFunc) message.HandlerFunc {
 	return func(msg *message.Message) ([]*message.Message, error) {
-		defer p.logger.Core().Info().Msg("Ending wallet creation")
 		p.logger.Core().Info().Msg("User was created... creating corresponding wallet")
 		producedMsg, err := h(msg)
-		if err != nil {
-			p.logger.Core().Error().Str("error", err.Error()).Msg("Failed to create wallet")
-		}
 		return producedMsg, err
 	}
 }

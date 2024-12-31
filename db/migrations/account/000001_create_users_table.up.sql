@@ -3,8 +3,7 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE,             -- Unique username
     email VARCHAR(255) NOT NULL UNIQUE,               -- Unique email address
     created_at timestamptz DEFAULT NOW() NOT NULL, -- Account creation timestamp
-    CHECK (char_length(username) >= 3),               -- Ensure username has at least 3 characters
-    CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$') -- Validate email format
+    CHECK (char_length(username) >= 3)               -- Ensure username has at least 3 characters
 );
 
 -- Indexes for fast lookups

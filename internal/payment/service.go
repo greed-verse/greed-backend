@@ -2,15 +2,15 @@ package payment
 
 import (
 	"context"
-	"math/big"
+	"fmt"
 
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/google/uuid"
+
 	"github.com/greed-verse/greed/internal/payment/repo"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func (p *Payment) CreateWallet(userId uuid.UUID, balance pgtype.Numeric) (repo.Wallet, error) {
+func (p *Payment) CreateWallet(userId string, balance pgtype.Numeric) (repo.Wallet, error) {
 	params := repo.CreateWalletParams{
 		UserID:  userId,
 		Balance: balance,
@@ -19,14 +19,16 @@ func (p *Payment) CreateWallet(userId uuid.UUID, balance pgtype.Numeric) (repo.W
 }
 
 func (p *Payment) walletHandler(msg *message.Message) error {
-	userid, err := uuid.FromBytes(msg.Payload)
+	f := 0.0
+
+	num := &pgtype.Numeric{}
+	err := num.Scan(fmt.Sprintf("%.2f", f)) // .2 specifies precision
 	if err != nil {
 		return err
 	}
-	var balance pgtype.Numeric
-	balance.Int.Set(big.NewInt(int64(0.0)))
+	fmt.Println(num)
 
-	_, err = p.CreateWallet(userid, balance)
+	_, err = p.CreateWallet(string(msg.Payload), *num)
 	if err != nil {
 		return err
 	}

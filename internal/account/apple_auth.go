@@ -2,12 +2,12 @@ package account
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
+	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/Timothylock/go-signin-with-apple/apple"
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 	"github.com/greed-verse/greed/internal/account/repo"
 	"github.com/greed-verse/greed/pkg/env"
 	"github.com/greed-verse/greed/pkg/validator"
@@ -29,7 +29,7 @@ var config *AppleAuthConfig
 
 func (a *Account) validateAppleAuthInput(input *appleAuthRequest) error {
 	if input.Code == "" {
-		return fmt.Errorf("code is required")
+		return errors.New("Code is required")
 	}
 	return nil
 }
@@ -103,11 +103,7 @@ func (a *Account) HandleAppleAuth(ctx *fiber.Ctx) error {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
-		uid, err := uuid.NewV7()
-		if err != nil {
-			return err
-		}
-		var msg *message.Message = message.NewMessage(uid.String(), []byte(user.ID.String()))
+		var msg *message.Message = message.NewMessage(watermill.NewUUID(), []byte(user.ID))
 		a.pubsub.Core().Publish("user-created.topic", msg)
 	} else {
 		user, err = a.repo.GetUserByEmail(ctx.Context(), email)

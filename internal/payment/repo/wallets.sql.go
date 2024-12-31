@@ -8,7 +8,6 @@ package repo
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -19,7 +18,7 @@ RETURNING id, user_id, balance, updated_at
 `
 
 type CreateWalletParams struct {
-	UserID  uuid.UUID      `json:"user_id"`
+	UserID  string         `json:"user_id"`
 	Balance pgtype.Numeric `json:"balance"`
 }
 
@@ -40,7 +39,7 @@ DELETE FROM wallets
 WHERE id = $1
 `
 
-func (q *Queries) DeleteWallet(ctx context.Context, id uuid.UUID) error {
+func (q *Queries) DeleteWallet(ctx context.Context, id string) error {
 	_, err := q.db.Exec(ctx, deleteWallet, id)
 	return err
 }
@@ -51,7 +50,7 @@ FROM wallets
 WHERE id = $1
 `
 
-func (q *Queries) GetWalletByID(ctx context.Context, id uuid.UUID) (Wallet, error) {
+func (q *Queries) GetWalletByID(ctx context.Context, id string) (Wallet, error) {
 	row := q.db.QueryRow(ctx, getWalletByID, id)
 	var i Wallet
 	err := row.Scan(
@@ -69,7 +68,7 @@ FROM wallets
 WHERE user_id = $1
 `
 
-func (q *Queries) GetWalletByUserID(ctx context.Context, userID uuid.UUID) (Wallet, error) {
+func (q *Queries) GetWalletByUserID(ctx context.Context, userID string) (Wallet, error) {
 	row := q.db.QueryRow(ctx, getWalletByUserID, userID)
 	var i Wallet
 	err := row.Scan(
@@ -127,7 +126,7 @@ RETURNING id, user_id, balance, updated_at
 
 type UpdateWalletBalanceParams struct {
 	Balance pgtype.Numeric `json:"balance"`
-	UserID  uuid.UUID      `json:"user_id"`
+	UserID  string         `json:"user_id"`
 }
 
 func (q *Queries) UpdateWalletBalance(ctx context.Context, arg UpdateWalletBalanceParams) (Wallet, error) {
