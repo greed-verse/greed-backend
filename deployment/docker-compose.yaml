@@ -42,9 +42,11 @@ services:
       replicas: 3
     secrets:
       - APP_ADDRESS
+      - STRIPE_KEY
       - DB_URL
     environment:
       - APP_ADDRESS_FILE=/run/secrets/APP_ADDRESS
+      - STRIPE_KEY_FILE=/run/secrets/STRIPE_KEY
       - DB_URL_FILE=/run/secrets/DB_URL
 volumes:
   letsencrypt:
@@ -53,6 +55,8 @@ secrets:
   CF_DNS_API_TOKEN:
     external: true
   APP_ADDRESS:
+    external: true
+  STRIPE_KEY:
     external: true
   DB_URL:
     external: true

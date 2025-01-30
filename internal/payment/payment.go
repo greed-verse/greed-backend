@@ -40,6 +40,7 @@ func (p *Payment) serve() {
 	p.router.Get("/healthz", func(ctx *fiber.Ctx) error {
 		return ctx.JSON("Module: OK")
 	})
+	p.router.Post("/stripe/payment", p.Payment)
 }
 
 func (p *Payment) subscribe() error {

@@ -19,6 +19,7 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
+	github.com/stripe/stripe-go/v81 v81.2.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
 )
 

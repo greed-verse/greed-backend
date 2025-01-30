@@ -1,6 +1,7 @@
 package env
 
 import (
+	"github.com/stripe/stripe-go/v81"
 	"os"
 	"strings"
 	"sync"
@@ -10,6 +11,7 @@ type SecretStorer interface {
 	ResolveEnv(env string) (string, error)
 	DB_URL() string
 	APP_ADDRESS() string
+	STRIPE_KEY() string
 	APPLE_TEAM_ID() string
 	APPLE_CLIENT_ID() string
 	APPLE_KEY_ID() string
@@ -19,6 +21,7 @@ type SecretStorer interface {
 type Environment struct {
 	database        string
 	port            string
+	stripeKey       string
 	appleTeamId     string
 	appleClientId   string
 	appleKeyId      string
@@ -52,6 +55,12 @@ func newEnv() (SecretStorer, error) {
 		return nil, err
 	}
 
+	// Load the stripe Environment
+	stripeKey, err := environment.ResolveEnv("STRIPE_KEY")
+	if err != nil {
+		return nil, err
+	}
+
 	// teamId, err := environment.ResolveEnv("APPLE_TEAM_ID")
 	// if err != nil {
 	// 	return nil, err
@@ -73,12 +82,18 @@ func newEnv() (SecretStorer, error) {
 	// }
 
 	environment.database = url
+    environment.stripeKey = stripeKey
 	environment.port = port
+	environment.stripeKey = port
 	// environment.appleTeamId = teamId
 	// environment.appleClientId = clientId
 	// environment.appleKeyId = keyId
 	// environment.applePrivateKey = privateKey
 	return environment, nil
+}
+
+func (env *Environment) STRIPE_KEY() string {
+	return env.stripeKey
 }
 
 func (env *Environment) DB_URL() string {
